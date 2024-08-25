@@ -3,14 +3,17 @@ import { get, merge } from 'lodash';
 
 import { getUsersBySessionToken } from '../db/users';
 
-export const isOwner = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+export const isOwnerOrAdmin = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
     try {
         const { id } = req.params
         const currentUserId = get(req, 'identity._id') as string
+        const isAdmin = get(req, 'identity.isAdmin') as boolean
 
         if (!currentUserId) return res.sendStatus(403)
 
-        if (currentUserId.toString() !== id) return res.sendStatus(403)
+        console.log(req)
+
+        if (currentUserId.toString() !== id || isAdmin) return res.sendStatus(403)
 
         return next()
     } catch (error) {
@@ -29,7 +32,7 @@ export const isAuthenticated = async (req: express.Request, res: express.Respons
 
         if (!existingUser) return res.sendStatus(403)
 
-        merge(req, { identity: existingUser })
+        merge(req, { identity: { _id: existingUser._id.toString(), isAdmin: existingUser.isAdmin } })
 
         return next()
     } catch (error) {
