@@ -21,17 +21,14 @@ app.use(compression());
 app.use(cookieParser());
 app.use(bodyParser.json());
 
-
 const server = http.createServer(app);
 
 server.listen(8080, () => {
     console.log('Server is running on http://localhost:8080/');
 });
 
-const MONGO_URL = 'mongodb+srv://kaspiofir:WycUUi4OoC61HWIz@cluster0.8j8fs.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
-
 mongoose.Promise = Promise;
-mongoose.connect(MONGO_URL);
+mongoose.connect(process.env.MONGO_URL);
 mongoose.connection.on('error', (error: Error) => console.log(error));
 
 app.use('/', router())
